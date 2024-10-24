@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> {
     NotificationReceiver.requestPermission();
     FirebaseMessaging.onMessage.listen((message) {
       //NotificationReceiver.initLocalNotification(, message);
-      //NotificationReceiver.showNotification(message);
+      NotificationReceiver.showNotification(message);
       NotificationReceiver.showInAppDialog(context, message);
     });
   }
