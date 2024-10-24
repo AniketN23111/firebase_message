@@ -32,6 +32,14 @@ class NotificationReceiver {
     return fcmToken ?? '';
   }
 
+  // Initialize Firebase listeners for handling messages
+  static void firebaseInit(BuildContext context) {
+    FirebaseMessaging.onMessage.listen((message) {
+      initLocalNotification(context, message);
+      showNotification(message);
+    });
+  }
+
   static Future<void> initLocalNotification(
       BuildContext context, RemoteMessage message) async {
     var androidInitializationSettings =
@@ -47,12 +55,11 @@ class NotificationReceiver {
     );
   }
 
-  // Initialize Firebase listeners for handling messages
-  static void firebaseInit(BuildContext context) {
-    FirebaseMessaging.onMessage.listen((message) {
-      initLocalNotification(context, message);
-      showNotification(message);
-    });
+  static Future<void> handleMessage(
+      BuildContext context, RemoteMessage message) async {
+    if (message.data['type'] == 'chat') {
+      Navigator.pushNamed(context, RoutesName.chat, arguments: message);
+    }
   }
 
   // Show notification locally
@@ -85,13 +92,6 @@ class NotificationReceiver {
         message.notification!.body ?? 'No body',
         notificationDetails,
       );
-    }
-  }
-
-  static Future<void> handleMessage(
-      BuildContext context, RemoteMessage message) async {
-    if (message.data['type'] == 'chat') {
-      Navigator.pushNamed(context, RoutesName.chat, arguments: message);
     }
   }
 }
