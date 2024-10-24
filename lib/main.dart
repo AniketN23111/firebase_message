@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> {
     NotificationReceiver.requestPermission();
     FirebaseMessaging.onMessage.listen((message) {
       //NotificationReceiver.initLocalNotification(, message);
-      NotificationReceiver.showNotification(message);
+      //NotificationReceiver.showNotification(message);
       NotificationReceiver.showInAppDialog(context, message);
     });
   }
@@ -66,8 +66,8 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 124, 63, 230)),
+        colorScheme:
+            ColorScheme.fromSeed(seedColor: Color.fromARGB(242, 0, 157, 255)),
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
