@@ -14,6 +14,7 @@ import 'Constants/firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationReceiver.initLocalNotification();
 
   const fatalError = true;
   FlutterError.onError = (errorDetails) {
@@ -30,7 +31,6 @@ Future<void> main() async {
 
   String token = await NotificationReceiver.getToken();
   print(token);
-
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
@@ -42,18 +42,36 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Messgae Data BAckground: ${message.data}");
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    NotificationReceiver.requestPermission();
+    FirebaseMessaging.onMessage.listen((message) {
+      //NotificationReceiver.initLocalNotification(, message);
+      NotificationReceiver.showNotification(message);
+      NotificationReceiver.showInAppDialog(context, message);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 124, 63, 230)),
         useMaterial3: true,
       ),
-      home: const MyHomePage(),
+      debugShowCheckedModeBanner: false,
+      initialRoute: RoutesName.home,
       routes: {
         RoutesName.home: (context) => const MyHomePage(),
         RoutesName.extra: (context) => const Extrapage(),

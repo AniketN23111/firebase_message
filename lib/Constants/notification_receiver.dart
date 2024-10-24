@@ -32,16 +32,7 @@ class NotificationReceiver {
     return fcmToken ?? '';
   }
 
-  // Initialize Firebase listeners for handling messages
-  static void firebaseInit(BuildContext context) {
-    FirebaseMessaging.onMessage.listen((message) {
-      initLocalNotification(context, message);
-      showNotification(message);
-    });
-  }
-
-  static Future<void> initLocalNotification(
-      BuildContext context, RemoteMessage message) async {
+  static Future<void> initLocalNotification() async {
     var androidInitializationSettings =
         const AndroidInitializationSettings("@drawable/mobigic_logo");
     var initializationSettings = InitializationSettings(
@@ -49,14 +40,13 @@ class NotificationReceiver {
     );
     _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (payload) {
-        handleMessage(context, message);
-      },
+      // onDidReceiveNotificationResponse: (payload) {
+      //   handleMessage(context, message);
+      // },
     );
   }
 
-  static Future<void> handleMessage(
-      BuildContext context, RemoteMessage message) async {
+  static void handleMessage(BuildContext context, RemoteMessage message) {
     if (message.data['type'] == 'chat') {
       Navigator.pushNamed(context, RoutesName.chat, arguments: message);
     }
@@ -93,5 +83,26 @@ class NotificationReceiver {
         notificationDetails,
       );
     }
+  }
+
+  static void showInAppDialog(BuildContext context, RemoteMessage message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message.notification?.title ?? 'No title'),
+          content: Text(message.notification?.body ?? 'No body'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                handleMessage(context, message);
+              },
+              child: const Text('View'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
