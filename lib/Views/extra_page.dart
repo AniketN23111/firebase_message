@@ -21,16 +21,6 @@ class _ExtrapageState extends State<Extrapage> {
   @override
   void initState() {
     super.initState();
-    _openBox();
-  }
-
-  Future<void> _openBox() async {
-    userBox = await Hive.openBox<PersonalDetails>('personal_details');
-
-    setState(() {
-      name = userBox.get('name')?.name ?? '';
-      salary = userBox.get('name')?.salary ?? 0;
-    });
   }
 
   void saveData() async {
