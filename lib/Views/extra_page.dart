@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:message/Constants/person_service.dart';
+import 'package:message/Model/personal_details.dart';
 
 class Extrapage extends StatefulWidget {
   const Extrapage({super.key});
@@ -10,14 +12,32 @@ class Extrapage extends StatefulWidget {
 
 class _ExtrapageState extends State<Extrapage> {
   String name = '';
-  TextEditingController _name = TextEditingController();
-  late final userBox;
+  int salary = 0;
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _salaryController = TextEditingController();
+  late Box<PersonalDetails> userBox;
+  final PersonService _personService = PersonService();
 
   @override
   void initState() {
     super.initState();
-    userBox = Hive.box('hive_box');
-    name = userBox.get('name') ?? '';
+    _openBox();
+  }
+
+  Future<void> _openBox() async {
+    userBox = await Hive.openBox<PersonalDetails>('personal_details');
+
+    setState(() {
+      name = userBox.get('name')?.name ?? '';
+      salary = userBox.get('name')?.salary ?? 0;
+    });
+  }
+
+  void saveData() async {
+    String name = _nameController.text.trim();
+    int salary = int.parse(_salaryController.text);
+    var person = PersonalDetails(name, salary);
+    await _personService.addPerson(person);
   }
 
   @override
@@ -27,13 +47,10 @@ class _ExtrapageState extends State<Extrapage> {
       body: Center(
         child: Column(
           children: [
-            Text(name),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             TextFormField(
               keyboardType: TextInputType.text,
-              controller: _name,
+              controller: _nameController,
               validator: (text) {
                 if (text == null || text.isEmpty) {
                   return "Name is Empty";
@@ -41,24 +58,77 @@ class _ExtrapageState extends State<Extrapage> {
                 return null;
               },
               decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.all(15),
-                  hintText: 'Name',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide.none)),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.all(15),
+                hintText: 'Name',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
-            SizedBox(
-              height: 20,
+            SizedBox(height: 20),
+            TextFormField(
+              keyboardType: TextInputType.number,
+              controller: _salaryController,
+              validator: (text) {
+                if (text == null || text.isEmpty) {
+                  return "Salary is Empty";
+                }
+                return null;
+              },
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.all(15),
+                hintText: 'Salary',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
-            ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    userBox.put('name', _name.text);
-                  });
-                },
-                child: Text('Chnage Name')),
+            SizedBox(height: 20),
+            ElevatedButton(onPressed: saveData, child: Text('Save Data')),
+            SizedBox(height: 20),
+            FutureBuilder(
+              future: _personService.getAllPerson(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return ValueListenableBuilder(
+                    valueListenable:
+                        Hive.box<PersonalDetails>('personal_details')
+                            .listenable(),
+                    builder: (context, Box<PersonalDetails> box, _) {
+                      if (box.values.isEmpty) {
+                        return const Center(
+                            child: Text("No person available."));
+                      }
+                      return Expanded(
+                        child: ListView.builder(
+                          itemCount: box.values.length,
+                          itemBuilder: (context, index) {
+                            final person = box.getAt(index);
+                            return ListTile(
+                              title: Text(person?.name ?? 'N/A'),
+                              subtitle: Text('Salary: ${person?.salary ?? 0}'),
+                              trailing: IconButton(
+                                  onPressed: () {
+                                    _personService.deletePerson(index);
+                                  },
+                                  icon: Icon(Icons.delete)),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
           ],
         ),
       ),

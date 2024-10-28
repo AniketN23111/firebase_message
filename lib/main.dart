@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:message/Constants/notification_receiver.dart';
 import 'package:message/Constants/routes_name.dart';
+import 'package:message/Model/personal_details.dart';
 import 'package:message/Views/chat.dart';
 import 'package:message/Views/extra_page.dart';
 import 'package:message/Views/my_home_page.dart';
@@ -17,7 +18,7 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationReceiver.initLocalNotification();
   await Hive.initFlutter();
-  await Hive.openBox('hive_box');
+  Hive.registerAdapter(PersonalDetailsAdapter());
 
   const fatalError = true;
   FlutterError.onError = (errorDetails) {
