@@ -3,14 +3,14 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:message/Constants/person_service.dart';
 import 'package:message/Model/personal_details.dart';
 
-class Extrapage extends StatefulWidget {
-  const Extrapage({super.key});
+class ExtraPage extends StatefulWidget {
+  const ExtraPage({super.key});
 
   @override
-  State<Extrapage> createState() => _ExtrapageState();
+  State<ExtraPage> createState() => _ExtraPageState();
 }
 
-class _ExtrapageState extends State<Extrapage> {
+class _ExtraPageState extends State<ExtraPage> {
   String name = '';
   int salary = 0;
   TextEditingController _nameController = TextEditingController();
