@@ -76,7 +76,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: const Text('Extra Page'),
                         ),
                         ElevatedButton(
-                          onPressed: widget.signOut,
+                          onPressed: (){
+                            widget.signOut();
+                            Navigator.pushNamed(context, RoutesName.home);
+                          },
                           child: const Text('Log out'),
                         ),
                       ],

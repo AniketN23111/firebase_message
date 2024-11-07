@@ -8,6 +8,8 @@ import 'package:message/AsyncReduxActions/LoadingActions/is_loading.dart';
 import 'package:message/Model/user_model.dart';
 import 'package:message/app_state.dart';
 
+/* This Sample Google Sign in with Pramas
+ [GoogleSignInAction] - this class name */
 class GoogleSignInAction extends ReduxAction<AppState> {
   @override
   Future<AppState?> reduce() async {

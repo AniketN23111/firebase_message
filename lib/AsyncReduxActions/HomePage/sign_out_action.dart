@@ -7,7 +7,7 @@ import 'package:message/app_state.dart';
 
 class SignOutAction extends ReduxAction<AppState> {
   @override
-  FutureOr<AppState?> reduce() async {
+  Future<AppState?> reduce() async {
     await FirebaseAuth.instance.signOut();
     return state.copy(user: UserModel());
   }
